@@ -1,0 +1,16 @@
+# Jupyter and Python
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+# Data and intermediate tables never go in the repository
+*.parquet
+*.csv
+*.tsv
+*.tsv.gz
+*.json
+work/
+clickstream_work/
+spark-warehouse/
+metastore_db/
+derby.log
