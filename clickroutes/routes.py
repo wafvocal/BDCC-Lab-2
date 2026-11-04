@@ -86,7 +86,9 @@ def share_sql(view='monthly_cohort', suffix='', include_main_page=False,
     str
         Spark SQL that returns ``month, [grp,] route, n, views_per_day,
         share``, where ``share`` comes from ``SUM(n) OVER (PARTITION BY
-        month [, grp])``.
+        month [, grp])``. ``NULLIF`` turns an empty group into a missing
+        share instead of a division-by-zero error (Spark 4 runs SQL in
+        ANSI mode, which raises on division by zero).
     """
     routes = config.ATTRIBUTED_ROUTES if attributed_only else config.ROUTES
     stack = ', '.join(f"'{route}', n_{route}{suffix}" for route in routes)
@@ -113,7 +115,8 @@ def share_sql(view='monthly_cohort', suffix='', include_main_page=False,
     )
     SELECT month, {grp_key}route, n,
            n / days AS views_per_day,
-           n / SUM(n) OVER (PARTITION BY month{grp_part}) AS share
+           n / NULLIF(SUM(n) OVER (PARTITION BY month{grp_part}), 0)
+               AS share
     FROM by_route
     ORDER BY month, {grp_key}route
     """

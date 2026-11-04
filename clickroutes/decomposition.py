@@ -120,9 +120,12 @@ def decomposition_sql(early, late, routes=config.ROUTES, suffix='',
                     THEN 'matched'
                     WHEN j.v1 IS NULL THEN 'exit' ELSE 'entry' END AS status,
                j.v0, j.v1, j.sv0, j.sv1,
-               j.v0 / t.big_v0 AS w0, j.v1 / t.big_v1 AS w1,
-               j.sv0 / j.v0 AS s0, j.sv1 / j.v1 AS s1,
-               (t.big_sv0 / t.big_v0 + t.big_sv1 / t.big_v1) / 2 AS s_bar
+               j.v0 / NULLIF(t.big_v0, 0) AS w0,
+               j.v1 / NULLIF(t.big_v1, 0) AS w1,
+               j.sv0 / NULLIF(j.v0, 0) AS s0,
+               j.sv1 / NULLIF(j.v1, 0) AS s1,
+               (t.big_sv0 / NULLIF(t.big_v0, 0)
+                + t.big_sv1 / NULLIF(t.big_v1, 0)) / 2 AS s_bar
         FROM joined j CROSS JOIN totals t
     )
     SELECT /*+ BROADCAST(r) */

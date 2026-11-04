@@ -475,7 +475,8 @@ def unattributed_heavy(spark):
         SELECT month,
                SUM(CASE WHEN heavy THEN 1 ELSE 0 END) AS heavy_articles,
                SUM(CASE WHEN heavy THEN n_unattributed ELSE 0 END)
-                   / SUM(n_unattributed) AS share_of_unattributed
+                   / NULLIF(SUM(n_unattributed), 0)
+                   AS share_of_unattributed
         FROM (SELECT month, n_unattributed,
                      n_total / days >= {floor}
                      AND n_unattributed >= {share} * n_total AS heavy
@@ -485,8 +486,9 @@ def unattributed_heavy(spark):
     latest = cached_table('unattributed_heavy_latest', key,
                           lambda: spark.sql(f"""
         SELECT curr, n_total / days AS requests_per_day,
-               n_unattributed / n_total AS unattributed_share,
-               n_empty / n_total AS empty_share
+               n_unattributed / NULLIF(n_total, 0)
+                   AS unattributed_share,
+               n_empty / NULLIF(n_total, 0) AS empty_share
         FROM article_routes
         WHERE month = '{last}' AND curr <> '{main}'
           AND n_total / days >= {floor}
