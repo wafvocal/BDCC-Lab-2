@@ -35,11 +35,11 @@ FIGURE_DIR = Path('figures')
 STORAGE_QUOTA_GB = 50
 STORAGE_STOP_GB = 40
 GZ_TO_PARQUET_RATIO = 1.7
-MONTHS_PER_BATCH = int(os.environ.get('CLICKSTREAM_MONTHS_PER_BATCH', 4))
+MONTHS_PER_BATCH = int(os.environ.get('CLICKSTREAM_MONTHS_PER_BATCH', 8))
 FILES_PER_MONTH = 4
 
 # --------------------------------------------------------------- spark ----
-MAX_CORES = int(os.environ.get('CLICKSTREAM_MAX_CORES', 8))
+MAX_CORES = int(os.environ.get('CLICKSTREAM_MAX_CORES', 16))
 MIN_DRIVER_MEMORY_GB = 4
 MAX_DRIVER_MEMORY_GB = 16
 SHUFFLE_PARTITIONS_PER_CORE = 4
